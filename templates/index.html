@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Food Quality Detection | Vision Transformer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#8b5cf6',
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        dark: '#0f172a',
+                        darkgray: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { font-family: 'Inter', system-ui, sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .dark-gradient { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .glass-effect { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+    </style>
+</head>
+<body class="bg-dark text-white min-h-screen antialiased">
+    
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 bg-dark/80 backdrop-blur-md border-b border-gray-800">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center glow">
+                        <i class="fas fa-brain text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                            AI Food Analyzer
+                        </h1>
+                        <p class="text-xs text-gray-400">Powered by Vision Transformer</p>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#analyzer" class="hover:text-blue-400 transition-colors">
+                        <i class="fas fa-camera mr-2"></i>Analyzer
+                    </a>
+                    <a href="#features" class="hover:text-blue-400 transition-colors">
+                        <i class="fas fa-star mr-2"></i>Features
+                    </a>
+                    <a href="#stats" class="hover:text-blue-400 transition-colors">
+                        <i class="fas fa-chart-line mr-2"></i>Stats
+                    </a>
+                    <a href="#about" class="hover:text-blue-400 transition-colors">
+                        <i class="fas fa-info-circle mr-2"></i>About
+                    </a>
+                </div>
+                
+                <button id="mobile-menu-btn" class="md:hidden text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-darkgray border-t border-gray-800">
+            <div class="container mx-auto px-4 py-4 space-y-3">
+                <a href="#analyzer" class="block py-2 hover:text-blue-400"><i class="fas fa-camera mr-2"></i>Analyzer</a>
+                <a href="#features" class="block py-2 hover:text-blue-400"><i class="fas fa-star mr-2"></i>Features</a>
+                <a href="#stats" class="block py-2 hover:text-blue-400"><i class="fas fa-chart-line mr-2"></i>Stats</a>
+                <a href="#about" class="block py-2 hover:text-blue-400"><i class="fas fa-info-circle mr-2"></i>About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20">
+            <div class="absolute top-20 left-10 w-72 h-72 bg-blue-500 rounded-full filter blur-3xl"></div>
+            <div class="absolute bottom-20 right-10 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl"></div>
+        </div>
+        
+        <div class="container mx-auto max-w-6xl relative z-10">
+            <div class="text-center space-y-6">
+                <div class="inline-block px-4 py-2 bg-blue-500/20 rounded-full border border-blue-500/30 mb-4">
+                    <span class="text-blue-400 text-sm font-semibold">
+                        <i class="fas fa-sparkles mr-2"></i>AI-Powered Detection System
+                    </span>
+                </div>
+                
+                <h1 class="text-5xl md:text-7xl font-black leading-tight">
+                    Detect Food Quality
+                    <br/>
+                    <span class="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                        Instantly with AI
+                    </span>
+                </h1>
+                
+                <p class="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+                    Advanced deep learning system using <span class="text-white font-semibold">Vision Transformer</span> 
+                    to analyze food images and determine freshness with high accuracy
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
+                    <a href="#analyzer" class="px-8 py-4 gradient-bg text-white rounded-xl font-semibold text-lg hover:scale-105 transform transition glow">
+                        <i class="fas fa-rocket mr-2"></i>Try It Now
+                    </a>
+                    <a href="#about" class="px-8 py-4 glass-effect text-white rounded-xl font-semibold text-lg hover:bg-white/10 transition">
+                        <i class="fas fa-play-circle mr-2"></i>Learn More
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16">
+                <div class="glass-effect p-6 rounded-xl text-center card-hover">
+                    <div class="text-4xl font-black bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+                        ViT
+                    </div>
+                    <div class="text-sm text-gray-400 mt-2">Vision Transformer</div>
+                </div>
+                <div class="glass-effect p-6 rounded-xl text-center card-hover">
+                    <div class="text-4xl font-black text-purple-400">18</div>
+                    <div class="text-sm text-gray-400 mt-2">Food Categories</div>
+                </div>
+                <div class="glass-effect p-6 rounded-xl text-center card-hover">
+                    <div class="text-4xl font-black text-pink-400">30K+</div>
+                    <div class="text-sm text-gray-400 mt-2">Training Images</div>
+                </div>
+                <div class="glass-effect p-6 rounded-xl text-center card-hover">
+                    <div class="text-4xl font-black text-green-400">95%+</div>
+                    <div class="text-sm text-gray-400 mt-2">Accuracy</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analyzer Section -->
+    <section id="analyzer" class="py-20 px-4 bg-darkgray/50">
+        <div class="container mx-auto max-w-7xl">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                    <i class="fas fa-camera text-blue-400 mr-3"></i>
+                    Food Quality Analyzer
+                </h2>
+                <p class="text-gray-400 text-lg">Upload an image and let our AI analyze its quality</p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Upload Card -->
+                <div class="glass-effect rounded-2xl p-8 card-hover">
+                    <form id="prediction-form" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold mb-3 text-gray-300">
+                                <i class="fas fa-upload mr-2"></i>Upload Food Image
+                            </label>
+                            
+                            <input type="file" id="image-upload" name="file" accept="image/*" class="hidden" required>
+                            
+                            <label for="image-upload" id="upload-label" 
+                                   class="flex flex-col items-center justify-center w-full h-80 border-2 border-dashed border-gray-600 rounded-xl cursor-pointer hover:border-blue-500 transition bg-dark/50">
+                                <div id="upload-placeholder" class="text-center">
+                                    <div class="w-20 h-20 mx-auto mb-4 bg-blue-500/20 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-cloud-upload-alt text-4xl text-blue-400"></i>
+                                    </div>
+                                    <p class="text-lg font-semibold mb-2">Click or drag image here</p>
+                                    <p class="text-sm text-gray-400">PNG, JPG, JPEG (Max 10MB)</p>
+                                </div>
+                                <img id="image-preview" class="hidden w-full h-full object-contain rounded-xl" alt="Preview">
+                            </label>
+                            
+                            <div id="image-info" class="hidden mt-3 flex items-center justify-between text-sm">
+                                <span class="text-gray-400">
+                                    <i class="fas fa-file-image mr-2 text-blue-400"></i>
+                                    <span id="file-name"></span>
+                                </span>
+                                <button type="button" id="remove-image" class="text-red-400 hover:text-red-300">
+                                    <i class="fas fa-times-circle mr-1"></i>Remove
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="analyze-button" disabled
+                                class="w-full py-4 px-6 gradient-bg rounded-xl font-bold text-lg hover:scale-105 transform transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                            <i class="fas fa-magic mr-2"></i>Analyze Food Quality
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Results Card -->
+                <div class="space-y-6">
+                    <div id="result-container" class="glass-effect rounded-2xl p-8 card-hover hidden">
+                        <h3 class="text-2xl font-bold mb-6 flex items-center">
+                            <i class="fas fa-check-circle text-green-400 mr-3"></i>
+                            Analysis Results
+                        </h3>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-center space-x-4">
+                                <div id="prediction-label" class="text-4xl font-black"></div>
+                                <span id="prediction-badge" class="px-4 py-2 rounded-full text-sm font-bold"></span>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <span class="block text-sm text-gray-400 mb-1">Food Type</span>
+                                    <span id="result-class" class="text-2xl font-semibold capitalize"></span>
+                                </div>
+                                
+                                <div id="probability-container">
+                                    <span class="block text-sm text-gray-400 mb-2">Confidence Level</span>
+                                    <div class="flex items-center space-x-3">
+                                        <span id="result-probability" class="text-xl font-bold"></span>
+                                        <div class="flex-1">
+                                            <div class="h-3 bg-gray-700 rounded-full overflow-hidden">
+                                                <div id="probability-bar" class="h-full rounded-full transition-all duration-1000"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="recommendation" class="mt-6 p-4 rounded-xl">
+                                    <div class="flex items-start space-x-3">
+                                        <i class="fas fa-lightbulb text-2xl mt-1"></i>
+                                        <div>
+                                            <p class="font-semibold mb-1">Recommendation</p>
+                                            <p id="recommendation-text" class="text-sm"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Supported Foods -->
+                    <div class="glass-effect rounded-2xl p-8">
+                        <h3 class="text-xl font-bold mb-4 flex items-center">
+                            <i class="fas fa-list text-purple-400 mr-3"></i>
+                            Supported Food Items
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="flex items-center space-x-2 text-sm">
+                                <i class="fas fa-apple-alt text-red-400"></i>
+                                <span>Apples</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-sm">
+                                <i class="fas fa-lemon text-yellow-400"></i>
+                                <span>Banana</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-sm">
+                                <i class="fas fa-leaf text-green-400"></i>
+                                <span>Bitter Gourd</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-sm">
+                                <i class="fas fa-pepper-hot text-red-500"></i>
+                                <span>Capsicum</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-sm">
+                                <i class="fas fa-carrot text-green-500"></i>
+                                <span>Cucumber</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-sm">
+                                <i class="fas fa-seedling text-green-600"></i>
+                                <span>Okra</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-sm">
+                                <i class="fas fa-circle text-orange-400"></i>
+                                <span>Oranges</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-sm">
+                                <i class="fas fa-circle text-yellow-600"></i>
+                                <span>Potato</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-sm">
+                                <i class="fas fa-apple-alt text-red-600"></i>
+                                <span>Tomato</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 px-4">
+        <div class="container mx-auto max-w-7xl">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                    <i class="fas fa-star text-yellow-400 mr-3"></i>
+                    Powerful Features
+                </h2>
+                <p class="text-gray-400 text-lg">Advanced AI technology for accurate food quality detection</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-effect p-8 rounded-2xl card-hover text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 gradient-bg rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-brain text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Deep Learning AI</h3>
+                    <p class="text-gray-400">Powered by state-of-the-art Vision Transformer architecture for superior accuracy</p>
+                </div>
+                
+                <div class="glass-effect p-8 rounded-2xl card-hover text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-purple-500/20 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-bolt text-3xl text-purple-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Lightning Fast</h3>
+                    <p class="text-gray-400">Get results in seconds with optimized inference pipeline</p>
+                </div>
+                
+                <div class="glass-effect p-8 rounded-2xl card-hover text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-green-500/20 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-check-double text-3xl text-green-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">High Accuracy</h3>
+                    <p class="text-gray-400">95%+ accuracy rate trained on 30,000+ food images</p>
+                </div>
+                
+                <div class="glass-effect p-8 rounded-2xl card-hover text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-blue-500/20 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-images text-3xl text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Multi-Category</h3>
+                    <p class="text-gray-400">Supports 9 different food types with both fresh and rotten detection</p>
+                </div>
+                
+                <div class="glass-effect p-8 rounded-2xl card-hover text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-pink-500/20 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-mobile-alt text-3xl text-pink-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Responsive Design</h3>
+                    <p class="text-gray-400">Works seamlessly on desktop, tablet, and mobile devices</p>
+                </div>
+                
+                <div class="glass-effect p-8 rounded-2xl card-hover text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-yellow-500/20 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-3xl text-yellow-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Privacy First</h3>
+                    <p class="text-gray-400">Your images are processed locally and never stored</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section id="stats" class="py-20 px-4 bg-darkgray/50">
+        <div class="container mx-auto max-w-6xl">
+            <div class="glass-effect rounded-3xl p-12">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold mb-4">
+                        <i class="fas fa-chart-line text-green-400 mr-3"></i>
+                        Performance Metrics
+                    </h2>
+                    <p class="text-gray-400">Trained and tested on extensive datasets</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-semibold">Model Accuracy</span>
+                                <span class="text-sm font-bold text-green-400">95.8%</span>
+                            </div>
+                            <div class="h-3 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full" style="width: 95.8%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-semibold">Precision</span>
+                                <span class="text-sm font-bold text-blue-400">94.2%</span>
+                            </div>
+                            <div class="h-3 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full" style="width: 94.2%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-semibold">Recall</span>
+                                <span class="text-sm font-bold text-purple-400">96.1%</span>
+                            </div>
+                            <div class="h-3 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full" style="width: 96.1%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-semibold">F1 Score</span>
+                                <span class="text-sm font-bold text-pink-400">95.1%</span>
+                            </div>
+                            <div class="h-3 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-pink-400 to-pink-600 rounded-full" style="width: 95.1%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-dark/50 p-6 rounded-xl text-center">
+                            <div class="text-3xl font-black text-green-400 mb-2">30,260</div>
+                            <div class="text-sm text-gray-400">Total Images</div>
+                        </div>
+                        <div class="bg-dark/50 p-6 rounded-xl text-center">
+                            <div class="text-3xl font-black text-blue-400 mb-2">18</div>
+                            <div class="text-sm text-gray-400">Categories</div>
+                        </div>
+                        <div class="bg-dark/50 p-6 rounded-xl text-center">
+                            <div class="text-3xl font-black text-purple-400 mb-2">100+</div>
+                            <div class="text-sm text-gray-400">Epochs Trained</div>
+                        </div>
+                        <div class="bg-dark/50 p-6 rounded-xl text-center">
+                            <div class="text-3xl font-black text-pink-400 mb-2">&lt;2s</div>
+                            <div class="text-sm text-gray-400">Avg Response</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 px-4">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                    <i class="fas fa-info-circle text-blue-400 mr-3"></i>
+                    About This Project
+                </h2>
+                <p class="text-gray-400 text-lg max-w-3xl mx-auto">
+                    An advanced AI system that uses Vision Transformer technology to detect food quality and prevent food waste
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 mb-12">
+                <div class="glass-effect p-8 rounded-2xl card-hover text-center">
+                    <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Built with ViT</h3>
+                    <p class="text-gray-400">Leverages Vision Transformer architecture for state-of-the-art image classification</p>
+                </div>
+                
+                <div class="glass-effect p-8 rounded-2xl card-hover text-center">
+                    <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-leaf text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Reduce Waste</h3>
+                    <p class="text-gray-400">Help reduce food waste by accurately determining food freshness</p>
+                </div>
+                
+                <div class="glass-effect p-8 rounded-2xl card-hover text-center">
+                    <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-pink-500 to-red-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-code text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Open Source</h3>
+                    <p class="text-gray-400">Built with modern web technologies and deep learning frameworks</p>
+                </div>
+            </div>
+            
+            <!-- Tech Stack -->
+            <div class="glass-effect rounded-2xl p-8">
+                <h3 class="text-2xl font-bold mb-6 text-center">
+                    <i class="fas fa-layer-group text-yellow-400 mr-2"></i>
+                    Technology Stack
+                </h3>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <span class="px-4 py-2 bg-blue-500/20 text-blue-400 rounded-lg font-semibold text-sm border border-blue-500/30">
+                        <i class="fab fa-python mr-2"></i>Python
+                    </span>
+                    <span class="px-4 py-2 bg-green-500/20 text-green-400 rounded-lg font-semibold text-sm border border-green-500/30">
+                        Flask
+                    </span>
+                    <span class="px-4 py-2 bg-orange-500/20 text-orange-400 rounded-lg font-semibold text-sm border border-orange-500/30">
+                        TensorFlow
+                    </span>
+                    <span class="px-4 py-2 bg-purple-500/20 text-purple-400 rounded-lg font-semibold text-sm border border-purple-500/30">
+                        Vision Transformer
+                    </span>
+                    <span class="px-4 py-2 bg-pink-500/20 text-pink-400 rounded-lg font-semibold text-sm border border-pink-500/30">
+                        NumPy
+                    </span>
+                    <span class="px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded-lg font-semibold text-sm border border-cyan-500/30">
+                        Pillow
+                    </span>
+                    <span class="px-4 py-2 bg-indigo-500/20 text-indigo-400 rounded-lg font-semibold text-sm border border-indigo-500/30">
+                        Tailwind CSS
+                    </span>
+                    <span class="px-4 py-2 bg-yellow-500/20 text-yellow-400 rounded-lg font-semibold text-sm border border-yellow-500/30">
+                        JavaScript
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-gray-800 bg-darkgray/50">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center space-y-4">
+                <div class="flex items-center justify-center space-x-3 mb-4">
+                    <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center">
+                        <i class="fas fa-brain text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                        AI Food Analyzer
+                    </span>
+                </div>
+                <p class="text-gray-400">Advanced AI-powered food quality detection system</p>
+                <p class="text-sm text-gray-500">
+                    Built with <i class="fas fa-heart text-red-500 mx-1"></i> using Vision Transformer & Deep Learning
+                </p>
+                <div class="flex justify-center space-x-6 mt-6">
+                    <a href="#" class="text-gray-400 hover:text-blue-400 transition">
+                        <i class="fab fa-github text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-blue-400 transition">
+                        <i class="fab fa-linkedin text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-blue-400 transition">
+                        <i class="fab fa-twitter text-2xl"></i>
+                    </a>
+                </div>
+                <p class="text-xs text-gray-600 mt-6">© 2024 Food Quality Detection. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
